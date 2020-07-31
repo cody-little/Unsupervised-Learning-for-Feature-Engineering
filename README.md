@@ -40,3 +40,30 @@ The next step I take is to look at the correlations among the features and the t
 By looking at correlations between the features and target lable I can start to picture what quality wines have in common from a conceptual level. When I evaluate clusters through a human judgement approach later this will come in handy. Since I can see that some combinations of features influence the quality of wine I can plot them visually with scatterplots to dig a little deeper in understanding their relationship. 
 
 ![](https://github.com/cody-little/Unsupervised-Learning-for-Feature-Engineering/blob/master/img/unsupervised%20scatter%20plot.PNG)
+
+Once I spent some more time exploring combinations visually and different counts across quartiles I wanted to get a better understanding of my target labels. I do a quick value counts on the data set and see something really important
+
+```
+print(wine['quality'].value_counts())
+5    681
+6    638
+7    199
+4     53
+8     18
+3     10
+Name: quality, dtype: int64
+```
+
+This target label is highly unbalanced. In normal circumstances I would fix this in a few different ways:
+- The first would be that I wouldn't have wanted a six-way classification in the first place, I would have tried to simplify the outcomes in a binary or perhaps three label classification for wine quality (bad,okay,good)
+- The second could be creating synthetic data to even out the proportions if you really wanted to use a six-way classification (though this has its own drawbacks and disadvantages)
+
+For the purposes of this experiment I thought it would be interesting to let this go. I want to test the efficacy of using an unsupervised cluster label as a feature in a supervised learning task and so far this task seems like it will be difficult due to a few disadvantages. The first is the small data set size, and the second is the unbalanced ratios of target labels. A third is that it will be difficult to learn the minute differences between very close labels (the 5 and 6 for example).
+
+##### Outcomes of EDA
+
+My first impressions from this exploration told me three things moving forward:
+
+- I will need to normalize the data
+- I don't have a huge amount of data to train on
+- This is a highly unbalanced target label on a six way classification task so keep outcome goals reasonable
