@@ -28,3 +28,9 @@ This machine learning project intends to discuss the usage of an unsupervised le
 
 The first step of this exploratory data analysis (EDA) is to just look at the data and see what I am working with. I am not a chemist or a sommelier so I know nothing about wine but all of the columns in this data set are numeric which means I can understand their distributions. 
 
+![](https://github.com/cody-little/Unsupervised-Learning-for-Feature-Engineering/blob/master/img/unsupervised%20learning%20label.PNG)
+
+This table gives me a good indication that later on I will have to normalize my numeric features to perform the k-means algorithim. Looking at the min/max and the standard deviation I can clearly see that some variables used as features will be pretty influential. Another thing I see immmediatly is that this isn't a huge data set. With just under 1,600 observations I wil not be able to use a more data hungry algorithim later on.
+
+The next step I take is to look at the correlations among the features and the target labels.
+
