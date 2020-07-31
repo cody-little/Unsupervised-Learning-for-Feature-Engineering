@@ -39,3 +39,4 @@ The next step I take is to look at the correlations among the features and the t
 
 By looking at correlations between the features and target lable I can start to picture what quality wines have in common from a conceptual level. When I evaluate clusters through a human judgement approach later this will come in handy. Since I can see that some combinations of features influence the quality of wine I can plot them visually with scatterplots to dig a little deeper in understanding their relationship. 
 
+![](https://github.com/cody-little/Unsupervised-Learning-for-Feature-Engineering/blob/master/img/unsupervised%20scatter%20plot.PNG)
