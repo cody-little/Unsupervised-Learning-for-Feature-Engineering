@@ -125,4 +125,37 @@ As you can see here or in the notebook this prints out each cluster for any rang
 
 Another method that is commmon and kind of fun is to plot on a two dimensional space the cluster outcomes. Below is a picture of a scatterplot where the hue is the cluster labels for k = 4. 
 
+![](https://github.com/cody-little/Unsupervised-Learning-for-Feature-Engineering/blob/master/img/unsupervised%20cluster%20plot.PNG)
+
+Using these two methods of manually checking how much data is in each cluster, the feature means, and a visualization of the clusters can be a good way to intuitively understand what the clusteing algorithim is doing behind the scenes. This also sides more on the data exploration side as well because we can gain an understanding of feature importance within the unsupervised task. 
+
+##### Step 3: A More Objective Approach to n Cluster Selection the Silhouette score
+
+My favorite objective measurement of clusters is the silhouette score. The silhouette score explained simply is a metric describing how similar observations are within their own cluster compared to other clusters. To implement the silhouette score analysis and find an optimal number of clusters it takes only a few lines of code.
+
+```
+from sklearn.metrics import silhouette_score as silly
+
+sils = []
+
+
+for i in range(2,11):
+  learner = KMeans(n_clusters=i, random_state=500)
+  clusters = learner.fit(wine_norm)
+  wine_norm["cluster"] = clusters.labels_
+  silouhette = silly(wine_norm, wine_norm["cluster"])
+  sils.append(silouhette)
+
+  print(f"K = {i}, silouette = {silouhette: .3f} ")
+  
+  K = 2, silouette =  0.517 
+K = 3, silouette =  0.567 
+K = 4, silouette =  0.612 
+K = 5, silouette =  0.638 
+K = 6, silouette =  0.641 
+K = 7, silouette =  0.646 
+K = 8, silouette =  0.661 
+K = 9, silouette =  0.665 
+K = 10, silouette =  0.669 
+```
 
