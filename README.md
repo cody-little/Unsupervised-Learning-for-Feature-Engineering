@@ -67,3 +67,62 @@ My first impressions from this exploration told me three things moving forward:
 - I will need to normalize the data
 - I don't have a huge amount of data to train on
 - This is a highly unbalanced target label on a six way classification task so keep outcome goals reasonable
+
+## Unsupervised Learning and Evaluation of Clusters
+
+##### Step 1: Normalize
+This section walks through the steps I took to normalize the data, apply the k-means algorithim, and evaluate the number of clusters I wanted to move forward with.
+The first step was normalizing the data so that no one feauture would draw too much attention to itself. In order to do this I just used sklearns built min normalizer to normalize the data set. First I removed the target label because I didn't want the target mean slipping knowledge into the clusters. 
+
+```
+scaler = MinMaxScaler()
+
+wine_norm = wine.drop(['quality'], axis = 1)
+columnnames = wine_norm.columns
+wine_norm = pd.DataFrame(scaler.fit_transform(wine_norm))
+wine_norm.columns = columnnames
+```
+##### Step 2: Evaluate Cluster Count with Human Judgement
+
+An important aspect of k-means clustering is determing the number of clusters to use. One method that you can employ is using your own judgement. Similar to a PCA we can use the clusters to understand the variation in means for each of our features. I create a function to print this information for all features and that is located in the notebook section of this repository. An example below is for a peak at what this syntax looks like and the output you get.
+
+```
+def describe_cluster(cluster_instances): 
+  fixed_acidity = cluster_instances["fixed acidity"].mean()
+  volatile_acidity = cluster_instances['volatile acidity'].mean()
+   print(f'Fixed acidity mean {fixed_acidity:.2f}')
+  print(f'Volatile Acidity Mean {volatile_acidity:.2f}')
+  
+for k in range(2,5):
+  print(f"Cluster Statistics for k = {k}")
+
+  learner = KMeans(n_clusters=k)
+  clusters = learner.fit(wine_norm)
+
+
+
+  wine_norm["cluster"] = clusters.labels_
+  for cluster_id in wine_norm["cluster"].unique():
+        print(f"Cluster {cluster_id}")
+        cluster_instances = wine_norm.loc[wine_norm.cluster == cluster_id]
+        print(f"  {100*len(cluster_instances)/len(wine_norm):.1f}% of data.")
+        describe_cluster(cluster_instances)
+
+  print(f"-_-_-_-_-_-_-_-_-_-_-_-_-_-_")
+  
+  Output:
+  Cluster Statistics for k = 2
+Cluster 1
+  58.7% of data.
+Fixed acidity mean 0.24
+Volatile Acidity Mean 0.33
+Cluster 0
+  41.3% of data.
+Fixed acidity mean 0.45
+Volatile Acidity Mean 0.20
+```
+As you can see here or in the notebook this prints out each cluster for any range of k clusters that you may want. It also allows you to see how the means for each feature change across different clusters. Looking at the full output for all k clusters and features you can visually see how these metrics change. 
+
+Another method that is commmon and kind of fun is to plot on a two dimensional space the cluster outcomes. Below is a picture of a scatterplot where the hue is the cluster labels for k = 4. 
+
+
