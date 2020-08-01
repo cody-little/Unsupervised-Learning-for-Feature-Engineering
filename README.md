@@ -159,3 +159,82 @@ K = 9, silouette =  0.665
 K = 10, silouette =  0.669 
 ```
 
+## Supervised Learning Task Experiment
+
+Here is the fun stuff. I create an experiment for the six way supervised learning task. I want to see if there is a real difference between outcome metrics for the same task when one training set includes a cluster label as a feature. 
+
+First and foremost I need to actually add the clusters. I went with 9 because I am trusting the silhouette score for this specific task. I felt as if the gain in score for a tenth cluster wasn't worth the extra dimension in the data. Below is the simple syntax to add the clusters as a feature to our original data set.
+
+```
+final_learner = KMeans(n_clusters=9)
+final_learner_clusters = final_learner.fit(wine_norm)
+wine_norm["cluster"] = final_learner_clusters.labels_
+wine['cluster'] = wine_norm['cluster']
+```
+
+Next I use scikit learns implementation of a train test split so I have a randomly sampled train and test set with an approximate 80/20 split. Important to note in the syntax below is that I create *two* identical training sets with one specific differnece. "train set C" includes a cluster label within its data set. This ensures that the train sets are exaclty the same in every way except for that unsupervised label inclusion. It also ensures that they are tested on the same 20% test set. 
+
+```
+train_setC, test_set = train_test_split(wine, train_size = .80, test_size = .20,random_state = 500)
+train_set = train_setC.drop(['cluster'],axis=1)
+```
+
+Now that I have two almost identical training sets for the experiment I have to pick a supervised learning algorithim to perform the task. I chose a simple single decision tree for the task. I don't often get to work with a single tree because many times I opt for some type of forest algorithim instead so it is always fun to get back to my roots. The decision tree (CART specifically) was the first classifer I learned for machine learning purposes. Below I use a 5-k fold cross validation on a grid search to find optimal hyperperameters. Below I have some sample syntax of what this looks like. I walk through what this process was below
+
+##### Explanation
+
+Here I split an X and a y or the cluster data set. I designate it as a valid with the 'V' and then I create a scorer that uses cohen kappa coeffecient. I really like using this metric for validation purposes because it helps to give a better understanding of how the model will generalize to new data. I use the param_grid to look across various max depths, the splitting criterion (purity or information gain), the maximum number of features used and the splitter method of decided how to split the leaves. I did this same syntax for the train set without the clusters and surpirsinly the optimal hyperperameters for both were the same. The output for the cluster included model is below showing what those optimal hyperperameters are along with their respective kappa score.
+
+```
+Vcluster_X = train_setC.drop(['quality'],axis=1)
+Vcluster_y = train_setC['quality']
+
+kap_scorer = make_scorer(cohen_kappa_score)
+DT_Clusters_cv = GridSearchCV(DecisionTreeClassifier(random_state=500), param_grid={'criterion': ['gini','entropy'], 'max_depth': [100,500,1000,1500,2000,2500,3000],
+                                                                    'splitter': ['best','random'], 'max_features':[None,'auto','log2']}, cv = 5, scoring = kap_scorer)
+DT_Clusters_cv.fit(Vcluster_X,Vcluster_y)
+print('Cluster Decision Tree')
+print(DT_Clusters_cv.best_params_)
+dt_clusterbest = DT_Clusters_cv.best_params_
+print(f'best score is {DT_Clusters_cv.best_score_:.3f}')
+print('_______________________________________________')
+
+
+Cluster Decision Tree
+{'criterion': 'gini', 'max_depth': 100, 'max_features': None, 'splitter': 'best'}
+best score is 0.394
+```
+
+Next I fit the final models to these specifications, I include the full syntax just in case a reader is interested and doesn't feel like flipping to the notebook. I include the metric scores for various ways of evaluating the task as well. This is performed on the held out test set in order to maintain a robustness of results.
+
+```
+### Make Final Models and Test Them#
+#split the test set#
+testX = test_set.drop(['quality'],axis=1)
+testX_nocluster=test_set.drop(['quality','cluster'],axis=1)
+testy = test_set['quality']
+
+
+#Fit both final models#
+FinalCluster_DT = DecisionTreeClassifier(criterion='gini',max_depth=100,max_features=None,splitter='best',random_state=500).fit(Vcluster_X,Vcluster_y)
+Final_DT = DecisionTreeClassifier(criterion='gini',max_depth=100, max_features=None, splitter = 'best',random_state=500).fit(V_X,V_y)
+
+Cluster_predict = FinalCluster_DT.predict(testX)
+DT_predict = Final_DT.predict(testX_nocluster)
+
+#Get accuracy scores#
+cluster_acc = accuracy_score(testy,Cluster_predict)
+DT_acc = accuracy_score(testy,DT_predict)
+
+cluster_kap = cohen_kappa_score(testy,Cluster_predict,weights='quadratic')
+DT_kap = cohen_kappa_score(testy, DT_predict)
+cluster_conf = confusion_matrix(testy,Cluster_predict)
+DT_conf = confusion_matrix(testy,DT_predict)
+```
+
+
+## Results
+
+Below is the output from a little results cell I made.
+
+
