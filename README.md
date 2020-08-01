@@ -235,7 +235,5 @@ DT_conf = confusion_matrix(testy,DT_predict)
 
 ## Results
 
-Below is the output from a little results cell I made.
-
-![](https://github.com/cody-little/Unsupervised-Learning-for-Feature-Engineering/blob/master/img/unsupervised%20conf%201.PNG)
+Below is the output from a little results cell I made. As we can see there isnt't a clear winner between for this experiment. The control classifier (decision tree with no cluster feautre) did marginally better on accuracy. Meanwhile the decision tree with a cluster feature scored much higher on the quadratically weighted cohen's kappa score. If I were to take a hard stance and pick a winner I would pick the cluster feature inclusion model. The cohen's kappa score was weighted quadratically so both classifiers gained or lost for predicting a label that is closer or farther away from its true label. This can indicate the model is picking up some noise of what correct labels look like. Since the kappa metric was much higher in the tree with a cluster label feature it will probably generalize to new data much more effectively. I was really surprised by the results for both models though. This lowely single decision tree performed far above my expectations on such a disadvantaged task. Both models performed well above baseline accuracy and far beyond random guessing. This project really pulled the wool from over my eyes, I will be giving the CART algorithim the respect it deserves in my future work and include it in my model search selections.
 
